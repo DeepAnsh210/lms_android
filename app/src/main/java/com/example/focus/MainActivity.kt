@@ -1,5 +1,6 @@
 package com.example.focus
 
+import FocusTimerScreen
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,8 +33,8 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     FocusTimerScreen(
                         isServiceRunning = isServiceRunning,
-                        onStart = { interval ->
-                            startFocusTimerService(interval)
+                        onStart = { interval, soundResId ->
+                            startFocusTimerService(interval, soundResId)
                         },
                         onStop = {
                             stopFocusTimerService()
@@ -45,13 +46,14 @@ class MainActivity : ComponentActivity() {
     }
 
 
-private fun startFocusTimerService(interval: Long) {
-    val serviceIntent = Intent(this, FocusTimerService::class.java).apply {
-        putExtra("interval", interval)
+    private fun startFocusTimerService(interval: Long, soundResId: Int) {
+        val serviceIntent = Intent(this, FocusTimerService::class.java).apply {
+            putExtra("interval", interval)
+            putExtra("soundResId", soundResId)
+        }
+        startService(serviceIntent)
+        isServiceRunning = true
     }
-    startService(serviceIntent)
-    isServiceRunning = true
-}
 
 private fun stopFocusTimerService() {
     val serviceIntent = Intent(this, FocusTimerService::class.java)

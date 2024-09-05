@@ -29,8 +29,10 @@ class FocusTimerService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val intervalInMinutes = intent?.getLongExtra("interval", 1) ?: 1
+        val soundResId = intent?.getIntExtra("soundResId", R.raw.alertsound) ?: R.raw.alertsound
+
         startForegroundService()
-        startBeeping(intervalInMinutes)
+        startBeeping(intervalInMinutes, soundResId)
         return START_NOT_STICKY
     }
 
@@ -62,14 +64,14 @@ class FocusTimerService : Service() {
         }
     }
 
-    private fun startBeeping(intervalInMinutes: Long) {
-        stopBeeping() // Stop any existing job
+    private fun startBeeping(intervalInMinutes: Long, soundResId: Int) {
+        stopBeeping()
+        mediaPlayer = MediaPlayer.create(this, soundResId)
         beepJob = CoroutineScope(Dispatchers.IO).launch {
             while (isActive) {
-                beepNow()
-                delay(intervalInMinutes * 60 * 1000) // Convert minutes to milliseconds
+                mediaPlayer.start()
+                delay(intervalInMinutes * 60 * 1000)
             }
-
         }
     }
 
